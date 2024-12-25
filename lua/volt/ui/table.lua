@@ -1,4 +1,5 @@
 local get_column_widths = function(tb, w)
+  local fit_w = type(w) == "string"
   local maxrow = #tb[1]
   local sum = 0
   local result = {}
@@ -16,7 +17,7 @@ local get_column_widths = function(tb, w)
     sum = sum + maxlen
   end
 
-  local remaining_space = w - sum
+  local remaining_space = fit_w and sum or w - sum
   local ratio = math.floor(remaining_space / maxrow)
 
   local col_widths = vim.tbl_map(function(x)
@@ -24,9 +25,11 @@ local get_column_widths = function(tb, w)
     return x + ratio - 2
   end, result)
 
-  local last_item = col_widths[#col_widths]
-  -- -1 cuz last col has right border too
-  col_widths[#col_widths] = last_item + (w - sum) - 1
+  if not fit_w then
+    local last_item = col_widths[#col_widths]
+    -- -1 cuz last col has right border too
+    col_widths[#col_widths] = last_item + (fit_w and sum or w - sum) - 1
+  end
 
   return col_widths
 end
