@@ -3,6 +3,8 @@ local M = {}
 --- @class CheckboxOptions
 --- @field active boolean Indicates if the checkbox is active.
 --- @field txt string The text to display next to the checkbox.
+--- @field check string|nil Replace the default check icon with a custom one.
+--- @field uncheck string|nil Replace the deafult unchecked icon with a custom one.
 --- @field hlon? string|nil Highlight for the active state (optional).
 --- @field hloff? string|nil Highlight for the inactive state (optional).
 --- @field actions table|nil Actions associated with the checkbox (optional).
@@ -11,7 +13,7 @@ local M = {}
 --- @return string[] A table containing the checkbox representation.
 M.checkbox = function(o)
   return {
-    (o.active and "  " or "  ") .. o.txt,
+    (o.active and (o.check or "") or (o.uncheck or "")).. "  " .. o.txt,
     o.active and (o.hlon or "String") or (o.hloff or "ExInactive"),
     o.actions,
   }
