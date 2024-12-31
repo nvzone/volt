@@ -1,4 +1,4 @@
-Plugin made using volt 
+Plugins made using volt
 
 ## Minty
 
