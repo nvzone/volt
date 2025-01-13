@@ -26,8 +26,7 @@ if vim.g.base46_cache then
     ExBlack3Bg = { bg = colors.one_bg2 },
     ExBlack3Border = { bg = colors.one_bg2, fg = colors.one_bg2 },
     ExLightGrey = { fg = lighten(colors.grey, bg == "dark" and 35 or -35) },
-
-    CommentFg = { fg = colors.grey_fg },
+    CommentFg = { fg = colors.light_grey },
   }
 else
   local normal_bg = api.nvim_get_hl(0, { name = "Normal" }).bg
@@ -40,6 +39,11 @@ else
   local lighter_bg = lighten(normal_bg, 5)
   local black3_bg = lighten(normal_bg, 10)
 
+  local get_hl = function(name)
+    local data = api.nvim_get_hl(0, { name = name })
+    return hexadecimal_to_hex(data.fg)
+  end
+
   highlights = {
     ExDarkBg = { bg = darker_bg },
     ExDarkBorder = { bg = darker_bg, fg = darker_bg },
@@ -47,11 +51,10 @@ else
     ExBlack2Bg = { bg = lighter_bg },
     ExBlack2Border = { bg = lighter_bg, fg = lighter_bg },
 
-    ExRed = { link = "ErrorMsg" },
-    ExYellow = { link = "WarningMsg" },
-    ExBlue = { link = "Function" },
-    ExGreen = { link = "String" },
-
+    ExRed = { fg = get_hl "ErrorMsg" },
+    ExYellow = { fg = get_hl "WarningMsg" },
+    ExBlue = { fg = get_hl "Function" },
+    ExGreen = { fg = get_hl "String" },
     ExBlack3Bg = { bg = black3_bg },
     CommentFg = { fg = comment_fg },
     ExBlack3Border = { bg = black3_bg, fg = black3_bg },
