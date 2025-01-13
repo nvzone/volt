@@ -42,7 +42,7 @@ return function(data)
 
   for i = 10, 1, -1 do
     local line = {}
-    table.insert(line, { sidelabels[i], "comment" })
+    table.insert(line, { sidelabels[i], "commentfg" })
     table.insert(line, { " │ ", "linenr" })
     table.insert(lines, line)
   end

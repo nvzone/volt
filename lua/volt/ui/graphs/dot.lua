@@ -25,13 +25,13 @@ return function(data)
 
   for i = 10, 1, -1 do
     local line = {}
-    table.insert(line, { sidelabels[i], "comment" })
+    table.insert(line, { sidelabels[i], "commentfg" })
     table.insert(line, { " │", "linenr" })
     table.insert(lines, line)
   end
 
   table.insert(lines, { { string.rep(" ", sidelabels_data.maxw) }, bottom_line })
-  gen_graph(lines, data.val, data.hl or { "exblue", "comment" })
+  gen_graph(lines, data.val, data.hl or { "exblue", "commentfg" })
 
   local footer = utils.footer_label(data.footer_label, total_w, sidelabels_data.maxw)
   table.insert(lines, footer)

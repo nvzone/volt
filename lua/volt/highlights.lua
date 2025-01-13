@@ -4,6 +4,10 @@ local bg = vim.o.bg
 
 local highlights = {}
 
+local hexadecimal_to_hex = function(hex)
+  return "#" .. ("%06x"):format((hex == nil and 0 or hex))
+end
+
 if vim.g.base46_cache then
   local colors = dofile(vim.g.base46_cache .. "colors")
 
@@ -22,11 +26,15 @@ if vim.g.base46_cache then
     ExBlack3Bg = { bg = colors.one_bg2 },
     ExBlack3Border = { bg = colors.one_bg2, fg = colors.one_bg2 },
     ExLightGrey = { fg = lighten(colors.grey, bg == "dark" and 35 or -35) },
+
+    CommentFg = { fg = colors.grey_fg },
   }
 else
   local normal_bg = api.nvim_get_hl(0, { name = "Normal" }).bg
+  local comment_fg = api.nvim_get_hl(0, { name = "comment" }).fg
 
-  normal_bg = "#" .. ("%06x"):format((normal_bg == nil and 0 or normal_bg))
+  normal_bg = hexadecimal_to_hex(normal_bg)
+  comment_fg = hexadecimal_to_hex(comment_fg)
 
   local darker_bg = lighten(normal_bg, -3)
   local lighter_bg = lighten(normal_bg, 5)
@@ -45,8 +53,9 @@ else
     ExGreen = { link = "String" },
 
     ExBlack3Bg = { bg = black3_bg },
+    CommentFg = { fg = comment_fg },
     ExBlack3Border = { bg = black3_bg, fg = black3_bg },
-    ExLightGrey = { fg = lighten(normal_bg, bg == "dark" and 35 or -35) },
+    ExLightGrey = { fg = lighten(comment_fg, bg == "dark" and 20 or -20) },
   }
 end
 

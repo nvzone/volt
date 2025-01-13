@@ -64,7 +64,7 @@ M.config = function(o)
   table.insert(line, inactivemark)
 
   if o.ratio_txt then
-    table.insert(line, { "  " .. o.val .. "%", "Comment" })
+    table.insert(line, { "  " .. o.val .. "%", "Commentfg" })
   end
 
   return line
