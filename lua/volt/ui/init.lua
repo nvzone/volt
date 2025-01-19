@@ -12,4 +12,5 @@ return {
   border = components.border,
   hpad = components.hpad,
   line_w = components.line_w,
+  tabs = require "volt.ui.tabs",
 }
