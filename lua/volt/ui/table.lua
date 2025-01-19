@@ -1,3 +1,5 @@
+local virt_linew = require("volt.ui.components").line_w
+
 local get_column_widths = function(tb, w)
   local fit_w = type(w) == "string"
   local maxrow = #tb[1]
@@ -10,7 +12,15 @@ local get_column_widths = function(tb, w)
     for _, row in ipairs(tb) do
       local txt = type(row[i]) == "table" and row[i][1] or row[i]
       local str = tostring(txt)
-      maxlen = math.max(maxlen, vim.api.nvim_strwidth(str))
+      local tmpw = 0
+
+      if type(row[i]) == "table" then
+        tmpw = virt_linew(row[i])
+      else
+        tmpw = vim.api.nvim_strwidth(str)
+      end
+
+      maxlen = math.max(maxlen, tmpw)
     end
 
     table.insert(result, maxlen)
@@ -74,8 +84,13 @@ return function(tbl, w, header_hl, title)
     for i, v in ipairs(row) do
       local maxlen = col_widths[i]
       local is_virt = type(v) == "table"
-      local text = tostring(is_virt and v[1] or v)
-      local strlen = vim.api.nvim_strwidth(text)
+      local strlen
+
+      if is_virt then
+        strlen = virt_linew(v)
+      else
+        strlen = vim.api.nvim_strwidth(tostring(v))
+      end
 
       local pad_w = math.floor((maxlen - strlen) / 2)
 
@@ -83,12 +98,21 @@ return function(tbl, w, header_hl, title)
       local r_pad = string.rep(" ", maxlen - pad_w - strlen)
 
       local hl = (line_i == 1 and (header_hl or "exgreen") or "normal")
-      hl = is_virt and v[2] or hl
-
-      local str = l_pad .. text .. r_pad
 
       table.insert(line, { "│ ", "linenr" })
-      table.insert(line, { str, hl })
+
+      -- Complex row i.e table of virt text..
+      if is_virt then
+        table.insert(line, { l_pad })
+        for _, virt in ipairs(v) do
+          table.insert(line, virt)
+        end
+        table.insert(line, { r_pad })
+      else
+        -- Simple row i.e just text
+        table.insert(line, { l_pad .. v .. r_pad, hl })
+      end
+
       table.insert(line, { (#row == i and "│") or "", "linenr" })
     end
 
