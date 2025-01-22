@@ -51,10 +51,10 @@ else
     ExBlack2Bg = { bg = lighter_bg },
     ExBlack2Border = { bg = lighter_bg, fg = lighter_bg },
 
-    ExRed = { fg = get_hl "ErrorMsg" },
-    ExYellow = { fg = get_hl "WarningMsg" },
+    ExRed = { fg = get_hl "removed" },
+    ExYellow = { fg = get_hl "changed" },
     ExBlue = { fg = get_hl "Function" },
-    ExGreen = { fg = get_hl "String" },
+    ExGreen = { fg = get_hl "added" },
     ExBlack3Bg = { bg = black3_bg },
     CommentFg = { fg = comment_fg },
     ExBlack3Border = { bg = black3_bg, fg = black3_bg },
