@@ -8,7 +8,7 @@ local gen_graph = function(lines, val, opts)
   local format_hl = opts.format_hl
 
   val = vim.tbl_map(function(x)
-    return x / 10
+    return (math.floor(x / 10) * 10) / 10
   end, val)
 
   for _, v in ipairs(val) do
