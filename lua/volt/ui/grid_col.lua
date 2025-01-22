@@ -1,12 +1,8 @@
+local linew = require("volt.ui.components").line_w
+
 local add_empty_space = function(lines, w, pad)
   for _, line in ipairs(lines) do
-    local len = 0
-
-    for _, cell in ipairs(line) do
-      len = len + vim.api.nvim_strwidth(cell[1])
-    end
-
-    table.insert(line, { string.rep(" ", w - len + pad) })
+    table.insert(line, { string.rep(" ", w - linew(line) + pad) })
   end
 
   return lines
