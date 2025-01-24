@@ -84,6 +84,19 @@ M.mappings = function(val)
     map("n", "<ESC>", function()
       utils.close(val)
     end, { buffer = buf })
+
+    if val.winclosed_event then
+      vim.api.nvim_create_autocmd("WinClosed", {
+        buffer = buf,
+        callback = function()
+          vim.schedule(function()
+            if state[buf] then
+              utils.close(val)
+            end
+          end)
+        end,
+      })
+    end
   end
 end
 
