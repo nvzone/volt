@@ -1,4 +1,11 @@
-Plugins made using volt
+# volt
+
+[Volt](https://nvchad.com/news/volt/) is a Neovim plugin to create interactive
+UIs within Neovim!
+
+# Showcase
+
+Showcase of plugins made using volt :zap:
 
 ## Minty
 
