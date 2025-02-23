@@ -23,6 +23,6 @@ Menu creator plugin for Neovim. [repo](https://github.com/NvChad/menu)
 
 ## NvChad's Theme Picker
 
-Base46 Theme picker with 3 different styles
+Base46 Theme picker with 3 different styles. [repo](https://github.com/NvChad/base46)
 
 ![image](https://github.com/user-attachments/assets/897e46f1-9ae2-4cc2-8fa2-64eff40a90dd)
