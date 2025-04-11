@@ -1,11 +1,12 @@
 # volt
 
-[Volt](https://nvchad.com/news/volt/) is a Neovim plugin to create interactive
-UIs within Neovim!
+Volt is a Neovim plugin to create interactive UIs within Neovim!
+
+## Docs to be added soon by 13/04/2025
 
 # Showcase
 
-Showcase of plugins made using volt :zap:
+Plugins made using volt :zap:
 
 ## Minty
 
@@ -20,6 +21,12 @@ Menu creator plugin for Neovim. [repo](https://github.com/NvChad/menu)
 
 ![image](https://github.com/user-attachments/assets/c8402279-b86d-432f-ad11-14a76c887ab1)
 
+## Typr
+
+A Neovim plugin for practice typing with a very beautiful dashboard. [repo](https://github.com/NvChad/typr)
+
+![typr](https://github.com/user-attachments/assets/4426d1c4-c4d3-4da7-987a-3b4c4395a4b5)
+![typrstats](https://github.com/user-attachments/assets/b1653de3-05f3-4b90-b35e-9341eed8bf3e)
 
 ## NvChad's Theme Picker
 
