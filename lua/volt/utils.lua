@@ -67,5 +67,23 @@ M.close = function(val)
   vim.g.nvmark_hovered = nil
 end
 
+M.get_hl = function(name)
+  local hexadecimal_to_hex = function(hex)
+    return "#" .. ("%06x"):format(hex == nil and 0 or hex)
+  end
+
+  local hl = api.nvim_get_hl(0, { name = name })
+  local result = {}
+
+  if hl.fg ~= nil then
+    result.fg = hexadecimal_to_hex(hl.fg)
+  end
+
+  if hl.bg ~= nil then
+    result.bg = hexadecimal_to_hex(hl.bg)
+  end
+
+  return result
+end
 
 return M
