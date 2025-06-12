@@ -13,7 +13,7 @@ local M = {}
 --- @return string[] A table containing the checkbox representation.
 M.checkbox = function(o)
   return {
-    (o.active and (o.check or "") or (o.uncheck or "")).. "  " .. o.txt,
+    (o.active and (o.check or "") or (o.uncheck or "")) .. "  " .. o.txt,
     o.active and (o.hlon or "String") or (o.hloff or "ExInactive"),
     o.actions,
   }
@@ -63,7 +63,9 @@ M.line_w = function(line)
   local w = 0
 
   for _, cell in ipairs(line) do
-    w = w + vim.api.nvim_strwidth(cell[1])
+    if cell[1] ~= "_pad_" then
+      w = w + vim.api.nvim_strwidth(cell[1])
+    end
   end
 
   return w
@@ -100,7 +102,7 @@ M.border = function(lines, hl)
 end
 
 M.hpad = function(line, w)
-  local pad_w = w - M.line_w(line) - 5
+  local pad_w = w - M.line_w(line)
 
   for i, v in ipairs(line) do
     if v[1] == "_pad_" then
