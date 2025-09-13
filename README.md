@@ -2,7 +2,6 @@
 
 Volt is a Neovim plugin to create interactive UIs within Neovim!
 
-## Docs to be added soon by 13/04/2025
 
 # Showcase
 
@@ -33,3 +32,6 @@ A Neovim plugin for practice typing with a very beautiful dashboard. [repo](http
 Base46 Theme picker with 3 different styles. [repo](https://github.com/NvChad/base46)
 
 ![image](https://github.com/user-attachments/assets/897e46f1-9ae2-4cc2-8fa2-64eff40a90dd)
+
+
+# Docs to be added soon before 2026
