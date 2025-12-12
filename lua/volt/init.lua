@@ -1,9 +1,11 @@
+-- Updated: expose icons API for Volt and provide helper M.get_file_icon
 local M = {}
 local api = vim.api
 local map = vim.keymap.set
 local draw = require "volt.draw"
 local state = require "volt.state"
 local utils = require "volt.utils"
+local icons = require "volt.icons"      -- new
 
 local get_section = function(tb, name)
   for _, value in ipairs(tb) do
@@ -137,6 +139,15 @@ M.close = function(buf)
   api.nvim_buf_call(buf, function()
     api.nvim_feedkeys("q", "x", false)
   end)
+end
+
+-- Expose icon utilities (new)
+M.icons = icons
+
+M.get_file_icon = function(filepath)
+  local name = vim.fn.fnamemodify(filepath, ":t")
+  local ext = vim.fn.fnamemodify(filepath, ":e")
+  return M.icons.get_icon_with_hl(name, ext)
 end
 
 return M
