@@ -1,0 +1,785 @@
+*volt.txt*  Create blazing fast & beautiful reactive UIs in Neovim
+
+==============================================================================
+CONTENTS                                                        *volt-contents*
+
+    1. Introduction ............................ |volt-introduction|
+    2. Installation ............................ |volt-installation|
+    3. Quick Start ............................. |volt-quickstart|
+    4. Core Functions .......................... |volt-functions|
+    5. UI Components ........................... |volt-components|
+    6. Event System ............................ |volt-events|
+    7. Color Utilities ......................... |volt-color|
+    8. Configuration ........................... |volt-config|
+    9. Examples ................................ |volt-examples|
+   10. Troubleshooting ......................... |volt-troubleshooting|
+   11. About ................................... |volt-about|
+
+==============================================================================
+INTRODUCTION                                                *volt-introduction*
+
+Volt is a framework for creating interactive, clickable, and hoverable user
+interfaces directly within Neovim using virtual text and extmarks.
+
+Features:~
+  • Rich UI components (sliders, checkboxes, tables, graphs)
+  • Full mouse and keyboard support
+  • Event-driven architecture
+  • Blazing fast rendering with extmarks
+  • Automatic theme adaptation
+  • Modular and composable
+
+==============================================================================
+INSTALLATION                                                *volt-installation*
+
+Using lazy.nvim:~
+>lua
+    {
+      "NvChad/volt",
+      lazy = true,
+    }
+<
+
+Using packer.nvim:~
+>lua
+    use {
+      "NvChad/volt",
+      opt = true,
+    }
+<
+
+Using Neovim built-in `vim.pack`:~
+>lua
+    vim.pack.add({
+      { src = "https://github.com/nvzone/volt" },
+    })
+<
+
+==============================================================================
+QUICK START                                                  *volt-quickstart*
+
+Minimal example:~
+>lua
+    local volt = require("volt")
+    
+    -- Create buffer
+    local buf = vim.api.nvim_create_buf(false, true)
+    
+    -- Define layout
+    local layout = {
+      {
+        name = "greeting",
+        lines = function()
+          return {
+            { { "Hello, Volt! ⚡", "Title" } }
+          }
+        end
+      }
+    }
+    
+    -- Setup
+    volt.gen_data({{
+      buf = buf,
+      layout = layout,
+      ns = vim.api.nvim_create_namespace("my_ui"),
+      xpad = 2,
+    }})
+    
+    -- Create window
+    local win = vim.api.nvim_open_win(buf, true, {
+      relative = "editor",
+      width = 40,
+      height = 5,
+      row = 10,
+      col = 10,
+      style = "minimal",
+      border = "rounded",
+    })
+    
+    -- Render
+    volt.run(buf, { h = 5, w = 40 })
+<
+
+==============================================================================
+CORE FUNCTIONS                                                *volt-functions*
+
+volt.gen_data({config})                                       *volt.gen_data()*
+    Generate state and calculate layout for UI buffers.
+
+    Parameters:~
+        {config}  List of buffer configurations
+    
+    Config structure:~
+        {
+          buf = buffer_id,
+          layout = layout_table,
+          ns = namespace_id,
+          xpad = horizontal_padding
+        }
+
+    Example:~
+>lua
+        volt.gen_data({
+          {
+            buf = buf,
+            layout = my_layout,
+            ns = vim.api.nvim_create_namespace("myui"),
+            xpad = 2
+          }
+        })
+<
+
+volt.run({buf}, {opts})                                          *volt.run()*
+    Render UI to buffer and setup event handlers.
+
+    Parameters:~
+        {buf}   Buffer ID
+        {opts}  Options table
+    
+    Options:~
+        {h}                  Height in lines
+        {w}                  Width in columns
+        {custom_empty_lines} Optional function to setup empty lines
+        {winclosed_event}    Auto-close on window close (boolean)
+
+    Example:~
+>lua
+        volt.run(buf, { 
+          h = 30, 
+          w = 80,
+          winclosed_event = true 
+        })
+<
+
+volt.redraw({buf}, {sections})                                 *volt.redraw()*
+    Redraw specific sections or entire UI.
+
+    Parameters:~
+        {buf}      Buffer ID
+        {sections} Section name (string), list of names, or "all"
+
+    Examples:~
+>lua
+        volt.redraw(buf, "header")
+        volt.redraw(buf, { "header", "content" })
+        volt.redraw(buf, "all")
+<
+
+volt.set_empty_lines({buf}, {n}, {w})                  *volt.set_empty_lines()*
+    Setup empty lines in buffer for rendering.
+
+    Parameters:~
+        {buf}  Buffer ID
+        {n}    Number of lines
+        {w}    Width of each line
+
+volt.mappings({config})                                      *volt.mappings()*
+    Setup default keymaps for buffers.
+
+    Config:~
+        {bufs}            List of buffer IDs
+        {winclosed_event} Enable WinClosed autocmd (boolean)
+
+    Default mappings:~
+        <CR>     Activate element under cursor
+        <Tab>    Cycle to next clickable
+        <S-Tab>  Cycle to previous clickable
+        q        Close UI
+        <Esc>    Close UI
+        <C-t>    Cycle buffers (if multiple)
+
+volt.toggle_func({open_fn}, {state})                     *volt.toggle_func()*
+    Helper for toggling UI visibility.
+
+    Parameters:~
+        {open_fn}  Function to open UI
+        {state}    Current state (boolean)
+
+volt.close({buf})                                              *volt.close()*
+    Close UI buffer.
+
+    Parameters:~
+        {buf}  Buffer ID (optional, defaults to current)
+
+==============================================================================
+UI COMPONENTS                                                *volt-components*
+
+volt.ui                                                            *volt.ui*
+
+The UI module provides pre-built components.
+
+------------------------------------------------------------------------------
+CHECKBOX                                                    *volt.ui.checkbox*
+
+volt.ui.checkbox({opts})
+    Create a toggleable checkbox.
+
+    Options:~
+        {active}   Current state (boolean)
+        {txt}      Label text (string)
+        {check}    Custom checked icon (string, default: "")
+        {uncheck}  Custom unchecked icon (string, default: "")
+        {hlon}     Active highlight (string)
+        {hloff}    Inactive highlight (string)
+        {actions}  Click handler (function)
+
+    Returns:~
+        Virtual text table for use in layout
+
+    Example:~
+>lua
+        local ui = require("volt.ui")
+        
+        local checkbox = ui.checkbox({
+          active = true,
+          txt = "Dark mode",
+          check = "✓",
+          uncheck = "✗",
+          hlon = "String",
+          hloff = "Comment",
+          actions = function()
+            -- Toggle logic
+          end
+        })
+<
+
+------------------------------------------------------------------------------
+SLIDER                                                        *volt.ui.slider*
+
+volt.ui.slider.config({opts})
+    Create an interactive slider.
+
+    Options:~
+        {txt}        Label text (string)
+        {val}        Current value 0-100 (number)
+        {w}          Width (number)
+        {hlon}       Active highlight (string)
+        {hloff}      Inactive highlight (string)
+        {thumb}      Show thumb indicator (boolean)
+        {thumb_icon} Custom thumb icon (string)
+        {ratio_txt}  Show percentage (boolean)
+        {actions}    Value change handler (function)
+
+    Example:~
+>lua
+        local slider = ui.slider.config({
+          txt = "Volume: ",
+          val = 50,
+          w = 40,
+          hlon = "String",
+          hloff = "Comment",
+          thumb = true,
+          ratio_txt = true,
+          actions = function()
+            local new_val = ui.slider.val(40, "Volume: ", 2)
+            print("New value:", new_val)
+          end
+        })
+<
+
+volt.ui.slider.val({w}, {left_txt}, {xpad}, {opts})
+    Get slider value based on cursor position.
+
+    Parameters:~
+        {w}        Slider width
+        {left_txt} Label text
+        {xpad}     Horizontal padding
+        {opts}     Options table
+
+    Returns:~
+        Value between 0-100
+
+------------------------------------------------------------------------------
+PROGRESSBAR                                              *volt.ui.progressbar*
+
+volt.ui.progressbar({opts})
+    Create a progress bar.
+
+    Options:~
+        {w}    Width (number)
+        {val}  Progress 0-100 (number)
+        {icon} Icon table: { on = "━", off = "─" }
+        {hl}   Highlight table: { on = "String", off = "Comment" }
+
+    Example:~
+>lua
+        local progress = ui.progressbar({
+          w = 30,
+          val = 65,
+          icon = { on = "━", off = "─" },
+          hl = { on = "String", off = "Comment" }
+        })
+<
+
+------------------------------------------------------------------------------
+SEPARATOR                                                  *volt.ui.separator*
+
+volt.ui.separator({char}, {w}, {hl})
+    Create a horizontal separator.
+
+    Parameters:~
+        {char}  Character to use (default: "─")
+        {w}     Width
+        {hl}    Highlight group (default: "linenr")
+
+------------------------------------------------------------------------------
+TABLE                                                          *volt.ui.table*
+
+volt.ui.table({data}, {w}, {header_hl}, {title})
+    Create a formatted table with borders.
+
+    Parameters:~
+        {data}      2D array of table data
+        {w}         Total width (or "fit" for auto-width)
+        {header_hl} Highlight for header row
+        {title}     Optional title virtual text
+
+    Example:~
+>lua
+        local tbl = ui.table(
+          {
+            { "Name", "Age", "City" },
+            { "Alice", "25", "NYC" },
+            { "Bob", "30", "LA" }
+          },
+          60,
+          "Title"
+        )
+<
+
+------------------------------------------------------------------------------
+TABS                                                            *volt.ui.tabs*
+
+volt.ui.tabs({data}, {w}, {opts})
+    Create tabbed interface.
+
+    Parameters:~
+        {data}  Array of tab names
+        {w}     Total width
+        {opts}  Options table
+
+    Options:~
+        {active}  Currently active tab
+        {hlon}    Active highlight
+        {hloff}   Inactive highlight
+
+    Example:~
+>lua
+        local tabs = ui.tabs(
+          { "Home", "Settings", "About" },
+          60,
+          { active = "Settings", hlon = "Title" }
+        )
+<
+
+------------------------------------------------------------------------------
+GRAPHS                                                        *volt.ui.graphs*
+
+volt.ui.graphs.bar({data})                                 *volt.ui.graphs.bar*
+    Create a bar graph.
+
+    Data structure:~
+        {
+          val = { 5, 8, 3, 10 },  -- Values (0-10 scale)
+          baropts = {
+            w = 3,                 -- Bar width
+            gap = 1,               -- Gap between bars
+            icon = "█",            -- Bar character
+            hl = "String",         -- Highlight
+            dual_hl = { "Comment", "String" },  -- Or dual colors
+            format_hl = function(val) end       -- Or dynamic hl
+          },
+          format_labels = function(val) end,
+          footer_label = { "Label", "HighlightGroup" }
+        }
+
+volt.ui.graphs.dot({data})                                 *volt.ui.graphs.dot*
+    Create a dot graph.
+
+    Data structure:~
+        {
+          val = { 5, 8, 3, 10 },
+          baropts = {
+            icons = { on = " 󰄰", off = " ·" },
+            hl = { on = "String", off = "Comment" },
+            sidelabels = true,
+            format_icon = function(val) end
+          }
+        }
+
+------------------------------------------------------------------------------
+LAYOUT COMPONENTS                                          *volt.ui.layout*
+
+volt.ui.grid_col({columns})                                *volt.ui.grid_col*
+    Arrange components in columns.
+
+    Parameters:~
+        {columns}  Array of column configs
+    
+    Column config:~
+        {
+          lines = line_table,
+          w = width,
+          pad = right_padding
+        }
+
+volt.ui.grid_row({parts})                                  *volt.ui.grid_row*
+    Concatenate multiple line groups horizontally.
+
+volt.ui.border({lines}, {hl})                                *volt.ui.border*
+    Add border around content. Modifies lines in-place.
+
+volt.ui.hpad({line}, {w})                                      *volt.ui.hpad*
+    Add horizontal padding to reach width. Replace "_pad_" markers.
+
+volt.ui.line_w({line})                                        *volt.ui.line_w*
+    Calculate line width from virtual text.
+
+==============================================================================
+EVENT SYSTEM                                                    *volt-events*
+
+volt.events                                                    *volt.events*
+
+The event system handles mouse and keyboard interactions.
+
+volt.events.enable()                                    *volt.events.enable()*
+    Enable global event system. Call once in your config.
+>lua
+        require("volt.events").enable()
+<
+
+volt.events.add({buf})                                      *volt.events.add()*
+    Register buffer(s) for event handling.
+
+    Parameters:~
+        {buf}  Buffer ID or array of IDs
+
+    Example:~
+>lua
+        local events = require("volt.events")
+        events.add(buf)
+        events.add({ buf1, buf2, buf3 })
+<
+
+------------------------------------------------------------------------------
+VIRTUAL TEXT ACTIONS                                        *volt-text-actions*
+
+Virtual text can have click and hover handlers:
+
+Click only:~
+>lua
+    {
+      "Click me",
+      "Highlight",
+      function()
+        print("Clicked!")
+      end
+    }
+<
+
+Click and hover:~
+>lua
+    {
+      "Hover me",
+      "Normal",
+      {
+        click = function()
+          print("Clicked!")
+        end,
+        hover = {
+          id = "unique_id",
+          callback = function()
+            vim.g.nvmark_hovered = "unique_id"
+          end,
+          redraw = { "section_to_update" }
+        }
+      }
+    }
+<
+
+Check hover state:~
+>lua
+    if vim.g.nvmark_hovered == "unique_id" then
+      -- Element is hovered
+    end
+<
+
+==============================================================================
+COLOR UTILITIES                                                  *volt-color*
+
+volt.color                                                      *volt.color*
+
+Comprehensive color manipulation utilities.
+
+volt.color.hex2rgb({hex})                                *volt.color.hex2rgb*
+    Convert hex color to RGB.
+
+    Returns:~
+        r, g, b (0-255)
+
+volt.color.rgb2hex({r}, {g}, {b})                        *volt.color.rgb2hex*
+    Convert RGB to hex color.
+
+volt.color.hex2hsl({hex})                                *volt.color.hex2hsl*
+    Convert hex to HSL.
+
+    Returns:~
+        h (0-360), s (0-1), l (0-1)
+
+volt.color.hsl2hex({h}, {s}, {l})                        *volt.color.hsl2hex*
+    Convert HSL to hex color.
+
+volt.color.change_hex_lightness({hex}, {percent})
+                                             *volt.color.change_hex_lightness*
+    Lighten or darken color.
+
+    Parameters:~
+        {hex}     Hex color
+        {percent} Amount (-100 to 100)
+
+volt.color.change_hex_saturation({hex}, {percent})
+                                            *volt.color.change_hex_saturation*
+    Change color saturation.
+
+volt.color.change_hex_hue({hex}, {percent})     *volt.color.change_hex_hue*
+    Shift color hue.
+
+volt.color.mix({first}, {second}, {strength})            *volt.color.mix*
+    Mix two colors.
+
+    Parameters:~
+        {first}    Primary color
+        {second}   Color to mix in
+        {strength} Amount of second color (0-100)
+
+volt.color.compute_gradient({hex1}, {hex2}, {steps})
+                                                *volt.color.compute_gradient*
+    Generate color gradient.
+
+    Returns:~
+        Array of hex colors
+
+volt.color.hex2complementary({hex}, {count})
+                                            *volt.color.hex2complementary*
+    Generate complementary colors.
+
+    Returns:~
+        Array of hex colors
+
+Example:~
+>lua
+    local color = require("volt.color")
+    
+    local lighter = color.change_hex_lightness("#ff5555", 20)
+    local mixed = color.mix("#ff5555", "#5555ff", 50)
+    local gradient = color.compute_gradient("#ff5555", "#5555ff", 10)
+<
+
+==============================================================================
+CONFIGURATION                                                    *volt-config*
+
+Volt works out of the box but can be customized.
+
+Highlight Groups:~
+    ExDarkBg, ExDarkBorder
+    ExBlack2Bg, ExBlack2Border
+    ExBlack3Bg, ExBlack3Border
+    ExRed, ExYellow, ExBlue, ExGreen
+    ExLightGrey, CommentFg
+
+These automatically adapt to your colorscheme or NvChad's base46.
+
+Custom highlights:~
+>lua
+    vim.api.nvim_set_hl(0, "MyCustomHL", {
+      fg = "#ff5555",
+      bg = "#282a36"
+    })
+<
+
+State Access:~
+>lua
+    local state = require("volt.state")
+    
+    -- Access buffer state
+    local buf_state = state[buf]
+    
+    -- Available fields:
+    -- buf_state.clickables
+    -- buf_state.hoverables
+    -- buf_state.layout
+    -- buf_state.ns
+    -- buf_state.xpad
+    -- buf_state.h
+<
+
+==============================================================================
+EXAMPLES                                                        *volt-examples*
+
+Simple Dialog:~
+>lua
+    local function show_dialog()
+      local volt = require("volt")
+      local ui = require("volt.ui")
+      local buf = vim.api.nvim_create_buf(false, true)
+      
+      local layout = {
+        {
+          name = "message",
+          lines = function()
+            return {
+              { { "Are you sure?", "Title" } },
+              { { "", "Normal" } },
+              {
+                { " Yes ", "String", function()
+                  print("Confirmed")
+                  volt.close(buf)
+                end },
+                { " ", "Normal" },
+                { " No ", "Error", function()
+                  volt.close(buf)
+                end }
+              }
+            }
+          end
+        }
+      }
+      
+      volt.gen_data({{
+        buf = buf,
+        layout = layout,
+        ns = vim.api.nvim_create_namespace("dialog"),
+        xpad = 2
+      }})
+      
+      vim.api.nvim_open_win(buf, true, {
+        relative = "editor",
+        width = 40,
+        height = 5,
+        row = 10,
+        col = 10,
+        style = "minimal",
+        border = "rounded"
+      })
+      
+      volt.run(buf, { h = 5, w = 40 })
+      require("volt.events").add(buf)
+    end
+<
+
+Interactive Settings:~
+>lua
+    local function show_settings()
+      local volt = require("volt")
+      local ui = require("volt.ui")
+      local buf = vim.api.nvim_create_buf(false, true)
+      
+      local settings = { volume = 50, notifications = true }
+      
+      local layout = {
+        {
+          name = "title",
+          lines = function()
+            return { { { "Settings", "Title" } } }
+          end
+        },
+        {
+          name = "volume",
+          lines = function()
+            return {
+              ui.slider.config({
+                txt = "Volume: ",
+                val = settings.volume,
+                w = 40,
+                hlon = "String",
+                thumb = true,
+                ratio_txt = true,
+                actions = function()
+                  settings.volume = ui.slider.val(40, "Volume: ", 2)
+                  volt.redraw(buf, "volume")
+                end
+              })
+            }
+          end
+        },
+        {
+          name = "notifications",
+          lines = function()
+            return {
+              ui.checkbox({
+                active = settings.notifications,
+                txt = "Notifications",
+                actions = function()
+                  settings.notifications = not settings.notifications
+                  volt.redraw(buf, "notifications")
+                end
+              })
+            }
+          end
+        }
+      }
+      
+      volt.gen_data({{ buf = buf, layout = layout,
+        ns = vim.api.nvim_create_namespace("settings"), xpad = 2 }})
+      
+      vim.api.nvim_open_win(buf, true, {
+        relative = "editor", width = 50, height = 10,
+        row = 5, col = 10, style = "minimal", border = "rounded"
+      })
+      
+      volt.run(buf, { h = 10, w = 50 })
+      require("volt.events").add(buf)
+    end
+<
+
+==============================================================================
+TROUBLESHOOTING                                          *volt-troubleshooting*
+
+Clicks not working?~
+    • Ensure events are enabled: `require("volt.events").enable()`
+    • Register your buffer: `require("volt.events").add(buf)`
+    • Check mouse: `:set mouse=a`
+
+UI not rendering?~
+    • Verify buffer is valid: `vim.api.nvim_buf_is_valid(buf)`
+    • Ensure window is visible
+    • Confirm `volt.run(buf, opts)` was called
+    • Check layout functions return proper format
+
+Colors look wrong?~
+    • Volt highlights load automatically
+    • Ensure colorscheme is set before loading Volt
+    • Check available highlights: `:so $VIMRUNTIME/syntax/hitest.vim`
+
+Layout issues?~
+    • Verify layout structure matches documentation
+    • Ensure lines functions return arrays of arrays
+    • Check virtual text format: `{ text, hl, action }`
+
+Performance issues?~
+    • Minimize redraws - redraw only changed sections
+    • Use specific section names instead of "all"
+    • Consider lazy rendering for large lists
+
+==============================================================================
+ABOUT                                                              *volt-about*
+
+Volt is created by Siduck (https://github.com/siduck) as part of the NvChad
+ecosystem (https://nvchad.com).
+
+Color utilities based on work by Leon Heidelbach.
+
+License: GNU General Public License v3.0
+
+Links:~
+    GitHub: https://github.com/NvChad/volt
+    Discord: https://discord.gg/gADmkJb9Fb
+    Website: https://nvchad.com
+
+Plugins built with Volt:~
+    • Minty - Color tools (https://github.com/NvChad/minty)
+    • Menu - Menu system (https://github.com/NvChad/menu)
+    • Typr - Typing practice (https://github.com/NvChad/typr)
+    • Base46 - Theme picker (https://github.com/NvChad/base46)
+
+ vim:tw=78:ts=8:noet:ft=help:norl:
