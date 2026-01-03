@@ -63,5 +63,7 @@ else
 end
 
 for name, val in pairs(highlights) do
-  vim.api.nvim_set_hl(0, name, val)
+  if vim.tbl_isempty(vim.api.nvim_get_hl(0, { name = name })) then
+    vim.api.nvim_set_hl(0, name, val)
+  end
 end
