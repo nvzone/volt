@@ -7,7 +7,7 @@ local MouseMove = vim.keycode "<MouseMove>"
 local LeftMouse = vim.keycode "<LeftMouse>"
 local map = vim.keymap.set
 
-local get_item_from_col = function(tb, n)
+local function get_item_from_col(tb, n)
   for _, val in ipairs(tb) do
     if val.col_start <= n and val.col_end >= n then
       return val
@@ -15,9 +15,12 @@ local get_item_from_col = function(tb, n)
   end
 end
 
-local run_func = function(foo)
+--- @param foo function|string
+local function run_func(foo)
+  ---@cast foo function
   if type(foo) == "function" then
     foo()
+  ---@cast foo string
   elseif type(foo) == "string" then
     vim.cmd(foo)
   end
@@ -56,6 +59,9 @@ local function set_cursormoved_autocmd(buf)
   })
 end
 
+--- @param buf integer
+--- @param row integer
+--- @param col integer
 local function handle_hover(buf_state, buf, row, col)
   -- clear old hovers!
   if buf_state.hovered_extmarks then
@@ -81,7 +87,8 @@ local function handle_hover(buf_state, buf, row, col)
   end
 end
 
-local buf_mappings = function(buf)
+--- @param buf integer
+local function buf_mappings(buf)
   set_cursormoved_autocmd(buf)
 
   map("n", "<CR>", function()
@@ -101,7 +108,7 @@ local M = {}
 
 M.bufs = {}
 
-M.add = function(val)
+function M.add(val)
   if type(val) == "table" then
     for _, buf in ipairs(val) do
       table.insert(M.bufs, buf)
@@ -113,7 +120,7 @@ M.add = function(val)
   end
 end
 
-M.enable = function()
+function M.enable()
   vim.g.extmarks_events = true
   vim.o.mousemev = true
 

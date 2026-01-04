@@ -1,6 +1,6 @@
 local virt_linew = require("volt.ui.components").line_w
 
-local get_column_widths = function(tb, w)
+local function get_column_widths(tb, w)
   local fit_w = type(w) == "string"
   local maxrow = #tb[1]
   local sum = 0
@@ -50,19 +50,23 @@ local border_chars = {
   corners_right = { top = "┐", bot = "┘", none = "┤" },
 }
 
-local table_border = function(points, row_type)
+--- @param points integer[]
+--- @param row_type string|nil
+local function table_border(points, row_type)
+  row_type = row_type or "none"
+
   local str = ""
   local tblen = #points
 
   for i, n in ipairs(points) do
-    local t_char = border_chars.mid[row_type or "none"]
+    local t_char = border_chars.mid[row_type]
     t_char = i == tblen and "" or t_char
 
     str = str .. string.rep("─", n + 1) .. t_char
   end
 
-  local l_char = border_chars.corners_left[row_type or "none"]
-  local r_char = border_chars.corners_right[row_type or "none"]
+  local l_char = border_chars.corners_left[row_type]
+  local r_char = border_chars.corners_right[row_type]
 
   return { { l_char .. str .. r_char, "linenr" } }
 end

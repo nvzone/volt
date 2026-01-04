@@ -11,7 +11,7 @@ local M = {}
 
 --- @param o CheckboxOptions The options for the checkbox.
 --- @return string[] A table containing the checkbox representation.
-M.checkbox = function(o)
+function M.checkbox(o)
   return {
     (o.active and (o.check or "") or (o.uncheck or "")) .. "  " .. o.txt,
     o.active and (o.hlon or "String") or (o.hloff or "ExInactive"),
@@ -27,7 +27,7 @@ end
 
 --- @param o ProgressOptions The options for the progress bar.
 --- @return table[] A table containing two elements: the active and inactive parts of the progress bar.
-M.progressbar = function(o)
+function M.progressbar(o)
   local opts = {
     icon = { on = "-", off = "-" },
     hl = { on = "exred", off = "linenr" },
@@ -44,11 +44,14 @@ M.progressbar = function(o)
   }
 end
 
-M.separator = function(char, w, hl)
+--- @param char string
+--- @param w integer
+--- @param hl string|nil
+function M.separator(char, w, hl)
   return { { string.rep(char or "─", w), hl or "linenr" } }
 end
 
-M.grid_row = function(tb)
+function M.grid_row(tb)
   local result = {}
   for _, lines in ipairs(tb) do
     for _, line in ipairs(lines) do
@@ -59,7 +62,7 @@ M.grid_row = function(tb)
   return result
 end
 
-M.line_w = function(line)
+function M.line_w(line)
   local w = 0
 
   for _, cell in ipairs(line) do
@@ -71,7 +74,8 @@ M.line_w = function(line)
   return w
 end
 
-M.border = function(lines, hl)
+--- @param hl string|nil
+function M.border(lines, hl)
   hl = hl or "linenr"
 
   local maxw = 0
@@ -101,7 +105,8 @@ M.border = function(lines, hl)
   table.insert(lines, { { "└" .. horiz_chars .. "┘", hl } })
 end
 
-M.hpad = function(line, w)
+--- @param w integer
+function M.hpad(line, w)
   local pad_w = w - M.line_w(line)
 
   for i, v in ipairs(line) do

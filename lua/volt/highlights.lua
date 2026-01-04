@@ -2,9 +2,11 @@ local api = vim.api
 local lighten = require("volt.color").change_hex_lightness
 local bg = vim.o.bg
 
+---@type table<string, vim.api.keyset.highlight>
 local highlights = {}
 
-local hexadecimal_to_hex = function(hex)
+--- @param hex? integer
+local function hexadecimal_to_hex(hex)
   return "#" .. ("%06x"):format((hex == nil and 0 or hex))
 end
 
@@ -29,7 +31,9 @@ if vim.g.base46_cache then
     CommentFg = { fg = colors.light_grey },
   }
 else
+  ---@type string|integer|nil
   local normal_bg = api.nvim_get_hl(0, { name = "Normal" }).bg
+  ---@type string|integer|nil
   local comment_fg = api.nvim_get_hl(0, { name = "comment" }).fg
 
   normal_bg = hexadecimal_to_hex(normal_bg)
@@ -39,7 +43,8 @@ else
   local lighter_bg = lighten(normal_bg, 5)
   local black3_bg = lighten(normal_bg, 10)
 
-  local get_hl = function(name)
+  --- @param name string
+  local function get_hl(name)
     local data = api.nvim_get_hl(0, { name = name })
     return hexadecimal_to_hex(data.fg)
   end

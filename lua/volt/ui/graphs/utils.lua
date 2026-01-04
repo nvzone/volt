@@ -1,6 +1,7 @@
 local M = {}
 
-M.gen_labels = function(format)
+--- @param format nil|fun(n: integer): string
+function M.gen_labels(format)
   local result = {}
   local max_strw = 0
 
@@ -13,7 +14,7 @@ M.gen_labels = function(format)
       num = tostring(i * 10)
     end
 
-    if #num > max_strw then
+    if num:len() > max_strw then
       max_strw = #num
     end
 
@@ -27,7 +28,7 @@ M.gen_labels = function(format)
   return { labels = result, maxw = max_strw + 1 }
 end
 
-M.footer_label = function(virt_txt, total_w, l_pad)
+function M.footer_label(virt_txt, total_w, l_pad)
   local strw = vim.api.nvim_strwidth(virt_txt[1]) / 2
   local pad = (total_w / 2 + l_pad) - strw
   return { { string.rep(" ", pad) }, virt_txt }

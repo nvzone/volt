@@ -4,7 +4,13 @@ local state = require "volt.state"
 
 local buf_i = 1
 
-M.cycle_bufs = function(bufs)
+--- @param hex integer|nil
+local function hexadecimal_to_hex(hex)
+  return "#" .. ("%06x"):format(hex == nil and 0 or hex)
+end
+
+--- @param bufs integer[]
+function M.cycle_bufs(bufs)
   buf_i = buf_i == #bufs and 1 or buf_i + 1
 
   local new_buf = bufs[buf_i]
@@ -13,7 +19,9 @@ M.cycle_bufs = function(bufs)
   api.nvim_set_current_win(a)
 end
 
-M.cycle_clickables = function(buf, step)
+--- @param buf integer
+--- @param step number
+function M.cycle_clickables(buf, step)
   local bufstate = state[buf]
   local lines = {}
 
@@ -37,7 +45,7 @@ M.cycle_clickables = function(buf, step)
   end
 end
 
-M.close = function(val)
+function M.close(val)
   local event_bufs = require("volt.events").bufs
 
   for _, buf in ipairs(val.bufs) do
@@ -67,13 +75,12 @@ M.close = function(val)
   vim.g.nvmark_hovered = nil
 end
 
-M.get_hl = function(name)
-  local hexadecimal_to_hex = function(hex)
-    return "#" .. ("%06x"):format(hex == nil and 0 or hex)
-  end
-
-  local hl = api.nvim_get_hl(0, { name = name })
+--- @param name string
+--- @return vim.api.keyset.highlight result
+function M.get_hl(name)
+  ---@type vim.api.keyset.highlight
   local result = {}
+  local hl = api.nvim_get_hl(0, { name = name })
 
   if hl.fg ~= nil then
     result.fg = hexadecimal_to_hex(hl.fg)

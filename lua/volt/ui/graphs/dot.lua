@@ -6,7 +6,7 @@ local default_opts = {
   sidelabels = true,
 }
 
-local gen_graph = function(lines, val, baropts)
+local function gen_graph(lines, val, baropts)
   local icons = baropts.icons
 
   val = vim.tbl_map(function(x)

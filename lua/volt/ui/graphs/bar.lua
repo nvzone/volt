@@ -1,6 +1,6 @@
 local utils = require "volt.ui.graphs.utils"
 
-local gen_graph = function(lines, val, opts)
+local function gen_graph(lines, val, opts)
   local barchar = string.rep(opts.icon or "█", opts.w)
   local emptychar = string.rep(" ", opts.w)
   local gap = string.rep(" ", opts.gap)

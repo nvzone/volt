@@ -5,7 +5,9 @@ local draw = require "volt.draw"
 local state = require "volt.state"
 local utils = require "volt.utils"
 
-local get_section = function(tb, name)
+--- @param tb table
+--- @param name string
+local function get_section(tb, name)
   for _, value in ipairs(tb) do
     if value.name == name then
       return value
@@ -13,7 +15,7 @@ local get_section = function(tb, name)
   end
 end
 
-M.gen_data = function(data)
+function M.gen_data(data)
   for _, info in ipairs(data) do
     state[info.buf] = {}
 
@@ -39,7 +41,9 @@ M.gen_data = function(data)
   end
 end
 
-M.redraw = function(buf, names)
+--- @param buf integer
+--- @param names "all"|string|string[]
+function M.redraw(buf, names)
   local v = state[buf]
 
   if names == "all" then
@@ -49,17 +53,21 @@ M.redraw = function(buf, names)
     return
   end
 
+  ---@cast names string
   if type(names) == "string" then
     draw(buf, get_section(v.layout, names))
     return
   end
 
+  ---@cast names string[]
   for _, name in ipairs(names) do
     draw(buf, get_section(v.layout, name))
   end
 end
 
-M.set_empty_lines = function(buf, n, w)
+--- @param buf integer
+--- @param w integer
+function M.set_empty_lines(buf, n, w)
   local empty_lines = {}
 
   for _ = 1, n, 1 do
@@ -69,7 +77,7 @@ M.set_empty_lines = function(buf, n, w)
   api.nvim_buf_set_lines(buf, 0, -1, true, empty_lines)
 end
 
-M.mappings = function(val)
+function M.mappings(val)
   for _, buf in ipairs(val.bufs) do
     -- cycle bufs
     map("n", "<C-t>", function()
@@ -100,7 +108,8 @@ M.mappings = function(val)
   end
 end
 
-M.run = function(buf, opts)
+--- @param buf integer
+function M.run(buf, opts)
   vim.bo[buf].filetype = "VoltWindow"
 
   if opts.custom_empty_lines then
@@ -120,15 +129,16 @@ M.run = function(buf, opts)
   end
 end
 
-M.toggle_func = function(open_func, ui_state)
+function M.toggle_func(open_func, ui_state)
   if ui_state then
     open_func()
-  else
-    api.nvim_feedkeys("q", "x", false)
+    return
   end
+
+  api.nvim_feedkeys("q", "x", false)
 end
 
-M.close = function(buf)
+function M.close(buf)
   if not buf then
     api.nvim_feedkeys("q", "x", false)
     return

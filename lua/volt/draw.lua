@@ -2,6 +2,7 @@ local api = vim.api
 local set_extmark = api.nvim_buf_set_extmark
 local state = require "volt.state"
 
+--- @param buf integer
 return function(buf, section)
   local v = state[buf]
   local section_lines = section.lines(buf)

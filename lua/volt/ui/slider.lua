@@ -1,7 +1,7 @@
 local api = vim.api
 local M = {}
 
-M.val = function(w, left_txt, xpad, opts)
+function M.val(w, left_txt, xpad, opts)
   opts = opts or {}
   local txt_len = vim.fn.strwidth(left_txt or "")
   w = w - txt_len - (opts.ratio and 5 or 0)
@@ -15,7 +15,7 @@ M.val = function(w, left_txt, xpad, opts)
   return math.ceil((col / w) * 100)
 end
 
-M.config = function(o)
+function M.config(o)
   local line = {}
 
   local left_txt_len = vim.fn.strwidth(o.txt or "")
