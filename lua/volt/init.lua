@@ -1,3 +1,14 @@
+--- @class VoltData.Layout
+--- @field name string
+--- @field lines fun(buf?: integer): (string[][][]|string[][])
+--- @field row? integer
+
+--- @class VoltData
+--- @field buf integer
+--- @field xpad integer
+--- @field ns integer
+--- @field layout VoltData.Layout[]
+
 local M = {}
 local api = vim.api
 local map = vim.keymap.set
@@ -15,6 +26,7 @@ local function get_section(tb, name)
   end
 end
 
+--- @param data VoltData[]
 function M.gen_data(data)
   for _, info in ipairs(data) do
     state[info.buf] = {}

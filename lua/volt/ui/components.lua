@@ -26,7 +26,7 @@ end
 --- @field hl? table  active/inactive highlights, ex: { on = "", off = ""}
 
 --- @param o ProgressOptions The options for the progress bar.
---- @return table[] A table containing two elements: the active and inactive parts of the progress bar.
+--- @return string[][] bar A table containing two elements: the active and inactive parts of the progress bar.
 function M.progressbar(o)
   local opts = {
     icon = { on = "-", off = "-" },
@@ -47,12 +47,15 @@ end
 --- @param char string
 --- @param w integer
 --- @param hl string|nil
+--- @return string[][] separator
 function M.separator(char, w, hl)
   return { { string.rep(char or "─", w), hl or "linenr" } }
 end
 
+--- @param tb (string[][][]|string[][])[]
+--- @return string[][][]|string[][] row
 function M.grid_row(tb)
-  local result = {}
+  local result = {} ---@type string[][][]|string[][]
   for _, lines in ipairs(tb) do
     for _, line in ipairs(lines) do
       table.insert(result, line)
@@ -62,6 +65,8 @@ function M.grid_row(tb)
   return result
 end
 
+--- @param line string[][]
+--- @return integer w
 function M.line_w(line)
   local w = 0
 
@@ -74,12 +79,13 @@ function M.line_w(line)
   return w
 end
 
+--- @param lines string[][][]
 --- @param hl string|nil
 function M.border(lines, hl)
   hl = hl or "linenr"
 
   local maxw = 0
-  local line_widths = {}
+  local line_widths = {} ---@type integer[]
 
   for _, line in ipairs(lines) do
     local linew = M.line_w(line)
@@ -105,7 +111,9 @@ function M.border(lines, hl)
   table.insert(lines, { { "└" .. horiz_chars .. "┘", hl } })
 end
 
+--- @param line string[][]
 --- @param w integer
+--- @return string[][] line
 function M.hpad(line, w)
   local pad_w = w - M.line_w(line)
 

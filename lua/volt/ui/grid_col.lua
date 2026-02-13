@@ -1,5 +1,8 @@
 local linew = require("volt.ui.components").line_w
 
+--- @param lines string[][][]|string[][]
+--- @param w integer
+--- @param pad integer
 local function add_empty_space(lines, w, pad)
   for _, line in ipairs(lines) do
     table.insert(line, { string.rep(" ", w - linew(line) + pad) })
@@ -8,15 +11,18 @@ local function add_empty_space(lines, w, pad)
   return lines
 end
 
+--- @param t1 any[]
+--- @param t2 any[]
 local function append_tb(t1, t2)
   for _, v in ipairs(t2) do
     table.insert(t1, v)
   end
 end
 
+--- @param columns { lines: string[][][]|string[][], w: integer, pad?: integer }[]
 return function(columns)
-  local ui_sections = {}
-  local empty_space = {}
+  local ui_sections = {} ---@type (string[][][]|string[][])[]
+  local empty_space = {} ---@type string[][]
   local h = 0
 
   for _, column in ipairs(columns) do

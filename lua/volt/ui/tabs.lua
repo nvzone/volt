@@ -1,3 +1,7 @@
+--- @param data string[]
+--- @param w integer
+--- @param opts { active: string, hlon?: string, hloff?: string }
+--- @return string[][][]|string[][] lines
 return function(data, w, opts)
   local total_str_w = -1 -- cuz last tab doesnt need gap
 
@@ -8,7 +12,7 @@ return function(data, w, opts)
     end
   end
 
-  local lines = { {}, {}, {} }
+  local lines = { {}, {}, {} } ---@type string[][][]|string[][]
 
   local datalen = #data
   for i, v in ipairs(data) do
