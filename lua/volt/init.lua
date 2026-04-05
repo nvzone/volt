@@ -2,6 +2,7 @@
 --- @field name string
 --- @field lines fun(buf?: integer): (string[][][]|string[][])
 --- @field row? integer
+--- @field col_start? integer
 
 --- @class VoltData
 --- @field buf integer
@@ -9,6 +10,7 @@
 --- @field ns integer
 --- @field layout VoltData.Layout[]
 
+---@class Volt
 local M = {}
 local api = vim.api
 local map = vim.keymap.set
@@ -16,8 +18,9 @@ local draw = require "volt.draw"
 local state = require "volt.state"
 local utils = require "volt.utils"
 
---- @param tb table
+--- @param tb VoltData.Layout[]
 --- @param name string
+--- @return VoltData.Layout | nil
 local function get_section(tb, name)
   for _, value in ipairs(tb) do
     if value.name == name then
@@ -65,8 +68,8 @@ function M.redraw(buf, names)
     return
   end
 
-  ---@cast names string
   if type(names) == "string" then
+    ---@cast names string
     draw(buf, get_section(v.layout, names))
     return
   end

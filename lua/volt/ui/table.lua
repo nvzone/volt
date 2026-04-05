@@ -1,6 +1,6 @@
 local virt_linew = require("volt.ui.components").line_w
 
---- @param tb string[][][]|string[][]
+--- @param tb string[][][][]|string[][][]|string[][]
 --- @param w string|integer
 local function get_column_widths(tb, w)
   local fit_w = type(w) == "string"
@@ -73,10 +73,10 @@ local function table_border(points, row_type)
   return { { l_char .. str .. r_char, "linenr" } }
 end
 
---- @param tbl string[][][]|string[][]
+--- @param tbl string[][][][]|string[][][]|string[][]
 --- @param w string|integer
 --- @param header_hl? string
---- @param title? string
+--- @param title? string[]|string
 --- @return string[][][]|string[][] lines
 return function(tbl, w, header_hl, title)
   local col_widths = get_column_widths(tbl, w)

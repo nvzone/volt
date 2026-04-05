@@ -29,19 +29,20 @@ local function gen_graph(lines, val, opts)
   end
 end
 
+---@return string[][][] lines
 return function(data)
-  local lines = {}
+  local lines = {} ---@type string[][][]
 
   local total_w = #data.val * (data.baropts.w + data.baropts.gap) + 1
-  local bottom_line = { "└" .. string.rep("─", total_w), "linenr" }
+  local bottom_line = { "└" .. ("─"):rep(total_w), "linenr" }
 
   local sidelabels_data = utils.gen_labels(data.format_labels)
   local sidelabels = sidelabels_data.labels
 
-  local l_pad = { string.rep(" ", sidelabels_data.maxw) }
+  local l_pad = { (" "):rep(sidelabels_data.maxw) }
 
   for i = 10, 1, -1 do
-    local line = {}
+    local line = {} ---@type string[][]
     table.insert(line, { sidelabels[i], "commentfg" })
     table.insert(line, { " │ ", "linenr" })
     table.insert(lines, line)

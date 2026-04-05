@@ -19,16 +19,17 @@ local function append_tb(t1, t2)
   end
 end
 
---- @param columns { lines: string[][][]|string[][], w: integer, pad?: integer }[]
+--- @param columns { lines: string[][][], w: integer, pad?: integer }[]
+--- @return string[][][] result
 return function(columns)
-  local ui_sections = {} ---@type (string[][][]|string[][])[]
+  local ui_sections = {} ---@type string[][][]|string[][]
   local empty_space = {} ---@type string[][]
   local h = 0
 
   for _, column in ipairs(columns) do
     local pad = column.pad or 0
     table.insert(ui_sections, add_empty_space(column.lines, column.w, pad))
-    table.insert(empty_space, { { string.rep(" ", column.w + pad) } })
+    table.insert(empty_space, { { (" "):rep(column.w + pad) } })
 
     local col_h = #column.lines
     if h < col_h then
@@ -36,7 +37,7 @@ return function(columns)
     end
   end
 
-  local result = {}
+  local result = {} ---@type string[][][]
 
   for i = 1, h do
     if not result[i] then

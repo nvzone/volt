@@ -26,6 +26,10 @@ local function run_func(foo)
   end
 end
 
+---@param buf integer
+---@param row integer
+---@param col integer
+---@param win integer
 local function handle_click(buf, by, row, col, win)
   local v = nvmark_state[buf]
 
