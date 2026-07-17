@@ -1,11 +1,11 @@
 ---@class Volt.State
----@field clickables? table
----@field hoverables? table
----@field xpad? integer
----@field ns? integer
 ---@field buf? integer
----@field layout? VoltData.Layout
+---@field clickables? table
 ---@field h? integer
+---@field hoverables? table<integer, any>
 ---@field hovered_extmarks? string[]
+---@field layout? VoltData.Layout
+---@field ns? integer
+---@field xpad? integer
 
 return {} ---@type Volt.State[]

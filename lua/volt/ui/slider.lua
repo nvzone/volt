@@ -1,12 +1,17 @@
-local api = vim.api
+---@class volt.UI.Slider
 local M = {}
 
+---@param w integer
+---@param left_txt string
+---@param xpad integer
+---@param opts? { ratio?: number, thumb?: string }
+---@return integer val
 function M.val(w, left_txt, xpad, opts)
   opts = opts or {}
   local txt_len = vim.fn.strwidth(left_txt or "")
   w = w - txt_len - (opts.ratio and 5 or 0)
 
-  local col = (api.nvim_win_get_cursor(0)[2] - txt_len - xpad)
+  local col = (vim.api.nvim_win_get_cursor(0)[2] - txt_len - xpad)
   col = opts.thumb and col + 1 or col
 
   col = col >= w and w or col
@@ -17,9 +22,7 @@ end
 
 function M.config(o)
   local line = {}
-
   local left_txt_len = vim.fn.strwidth(o.txt or "")
-
   if o.txt then
     table.insert(line, { o.txt })
     o.w = o.w - left_txt_len
@@ -36,29 +39,9 @@ function M.config(o)
     thumb_icon = o.val == 0 and "" or thumb_icon
   end
 
-  local active_str = string.rep("━", active_i - vim.fn.strwidth(thumb_icon))
-
-  local activemark = {
-    active_str .. thumb_icon,
-    o.hlon,
-    {
-      ui_type = "slider",
-      click = function()
-        o.actions()
-      end,
-    },
-  }
-
-  local inactivemark = {
-    string.rep("━", o.w - active_i),
-    o.hloff or "LineNr",
-    {
-      ui_type = "slider",
-      click = function()
-        o.actions()
-      end,
-    },
-  }
+  local active_str = ("━"):rep(active_i - vim.fn.strwidth(thumb_icon))
+  local activemark = { active_str .. thumb_icon, o.hlon, { ui_type = "slider", click = o.actions } }
+  local inactivemark = { ("━"):rep(o.w - active_i), o.hloff or "LineNr", { ui_type = "slider", click = o.actions } }
 
   table.insert(line, activemark)
   table.insert(line, inactivemark)

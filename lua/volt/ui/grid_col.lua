@@ -1,18 +1,18 @@
-local linew = require("volt.ui.components").line_w
-
---- @param lines string[][][]|string[][]
+--- @generic T: table
+--- @param lines T
 --- @param w integer
 --- @param pad integer
+--- @return T lines
 local function add_empty_space(lines, w, pad)
   for _, line in ipairs(lines) do
-    table.insert(line, { string.rep(" ", w - linew(line) + pad) })
+    table.insert(line, { (" "):rep(w - require("volt.ui.components").line_w(line) + pad) })
   end
-
   return lines
 end
 
---- @param t1 any[]
---- @param t2 any[]
+---@generic T: table, V: table
+--- @param t1 T
+--- @param t2 V
 local function append_tb(t1, t2)
   for _, v in ipairs(t2) do
     table.insert(t1, v)
@@ -38,7 +38,6 @@ return function(columns)
   end
 
   local result = {} ---@type string[][][]
-
   for i = 1, h do
     if not result[i] then
       table.insert(result, {})

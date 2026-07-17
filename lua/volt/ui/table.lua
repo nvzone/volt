@@ -1,5 +1,3 @@
-local virt_linew = require("volt.ui.components").line_w
-
 --- @param tb string[][][][]|string[][][]|string[][]
 --- @param w string|integer
 local function get_column_widths(tb, w)
@@ -7,17 +5,14 @@ local function get_column_widths(tb, w)
   local maxrow = #tb[1]
   local sum = 0
   local result = {}
-
   for i = 1, maxrow do
     local maxlen = 0
-
     for _, row in ipairs(tb) do
       local txt = type(row[i]) == "table" and row[i][1] or row[i]
       local str = tostring(txt)
       local tmpw = 0
-
       if type(row[i]) == "table" then
-        tmpw = virt_linew(row[i])
+        tmpw = require("volt.ui.components").line_w(row[i])
       else
         tmpw = vim.api.nvim_strwidth(str)
       end
@@ -57,14 +52,11 @@ local border_chars = {
 local function table_border(points, row_type)
   row_type = row_type or "none"
 
-  local str = ""
-  local tblen = #points
-
+  local tblen, str = #points, ""
   for i, n in ipairs(points) do
     local t_char = border_chars.mid[row_type]
     t_char = i == tblen and "" or t_char
-
-    str = str .. string.rep("─", n + 1) .. t_char
+    str = str .. ("─"):rep(n + 1) .. t_char
   end
 
   local l_char = border_chars.corners_left[row_type]
@@ -73,11 +65,12 @@ local function table_border(points, row_type)
   return { { l_char .. str .. r_char, "linenr" } }
 end
 
---- @param tbl string[][][][]|string[][][]|string[][]
+--- @generic T: table
+--- @param tbl T
 --- @param w string|integer
 --- @param header_hl? string
 --- @param title? string[]|string
---- @return string[][][]|string[][] lines
+--- @return T lines
 return function(tbl, w, header_hl, title)
   local col_widths = get_column_widths(tbl, w)
 
@@ -95,19 +88,10 @@ return function(tbl, w, header_hl, title)
     for i, v in ipairs(row) do
       local maxlen = col_widths[i]
       local is_virt = type(v) == "table"
-      local strlen
-
-      if is_virt then
-        strlen = virt_linew(v)
-      else
-        strlen = vim.api.nvim_strwidth(tostring(v))
-      end
-
+      local strlen = is_virt and require("volt.ui.components").line_w(v) or vim.api.nvim_strwidth(tostring(v))
       local pad_w = math.floor((maxlen - strlen) / 2)
-
-      local l_pad = string.rep(" ", pad_w)
-      local r_pad = string.rep(" ", maxlen - pad_w - strlen)
-
+      local l_pad = (" "):rep(pad_w)
+      local r_pad = (" "):rep(maxlen - pad_w - strlen)
       local hl = (line_i == 1 and (header_hl or "exgreen") or "normal")
 
       table.insert(line, { "│ ", "linenr" })
