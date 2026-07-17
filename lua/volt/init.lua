@@ -1,11 +1,25 @@
-local M = {}
-local api = vim.api
-local map = vim.keymap.set
-local draw = require "volt.draw"
-local state = require "volt.state"
-local utils = require "volt.utils"
+--- @class VoltData.Layout
+--- @field col_start? integer
+--- @field lines fun(buf?: integer): (string[][][]|string[][])
+--- @field name string
+--- @field row? integer
 
-local get_section = function(tb, name)
+--- @class VoltData
+--- @field buf integer
+--- @field layout VoltData.Layout[]
+--- @field ns integer
+--- @field xpad integer
+
+---@class Volt
+local M = {}
+local draw = require("volt.draw")
+local state = require("volt.state")
+local utils = require("volt.utils")
+
+--- @param tb VoltData.Layout[]
+--- @param name string
+--- @return VoltData.Layout|nil|?
+local function get_section(tb, name)
   for _, value in ipairs(tb) do
     if value.name == name then
       return value
@@ -13,7 +27,8 @@ local get_section = function(tb, name)
   end
 end
 
-M.gen_data = function(data)
+--- @param data VoltData[]
+function M.gen_data(data)
   for _, info in ipairs(data) do
     state[info.buf] = {}
 
@@ -28,7 +43,6 @@ M.gen_data = function(data)
     v.buf = buf
 
     local row = 0
-
     for _, value in ipairs(v.layout) do
       local lines = value.lines(buf)
       value.row = row
@@ -39,104 +53,105 @@ M.gen_data = function(data)
   end
 end
 
-M.redraw = function(buf, names)
+--- @param buf integer
+--- @param names string[]|string|"all"
+function M.redraw(buf, names)
   local v = state[buf]
-
   if names == "all" then
     for _, section in ipairs(v.layout) do
       draw(buf, section)
     end
-    return
-  end
-
-  if type(names) == "string" then
+  elseif type(names) == "string" then
     draw(buf, get_section(v.layout, names))
-    return
-  end
-
-  for _, name in ipairs(names) do
-    draw(buf, get_section(v.layout, name))
-  end
-end
-
-M.set_empty_lines = function(buf, n, w)
-  local empty_lines = {}
-
-  for _ = 1, n, 1 do
-    table.insert(empty_lines, string.rep(" ", w))
-  end
-
-  api.nvim_buf_set_lines(buf, 0, -1, true, empty_lines)
-end
-
-M.mappings = function(val)
-  for _, buf in ipairs(val.bufs) do
-    -- cycle bufs
-    map("n", "<C-t>", function()
-      utils.cycle_bufs(val.bufs)
-    end, { buffer = buf })
-
-    -- close
-    map("n", "q", function()
-      utils.close(val)
-    end, { buffer = buf })
-
-    map("n", "<ESC>", function()
-      utils.close(val)
-    end, { buffer = buf })
-
-    if val.winclosed_event then
-      vim.api.nvim_create_autocmd("WinClosed", {
-        buffer = buf,
-        callback = function()
-          vim.schedule(function()
-            if state[buf] then
-              utils.close(val)
-            end
-          end)
-        end,
-      })
+  else
+    for _, name in ipairs(names) do
+      draw(buf, get_section(v.layout, name))
     end
   end
 end
 
-M.run = function(buf, opts)
-  vim.bo[buf].filetype = "VoltWindow"
+--- @param buf integer
+--- @param n integer
+--- @param w integer
+function M.set_empty_lines(buf, n, w)
+  local empty_lines = {} ---@type string[]
+  for _ = 1, n, 1 do
+    table.insert(empty_lines, (" "):rep(w))
+  end
 
+  vim.api.nvim_buf_set_lines(buf, 0, -1, true, empty_lines)
+end
+
+function M.mappings(val)
+  for _, buf in ipairs(val.bufs) do
+    -- cycle bufs
+    vim.keymap.set("n", "<C-t>", function()
+      utils.cycle_bufs(val.bufs)
+    end, { buffer = buf })
+
+    -- close
+    vim.keymap.set("n", "q", function()
+      utils.close(val)
+    end, { buffer = buf })
+
+    vim.keymap.set("n", "<ESC>", function()
+      utils.close(val)
+    end, { buffer = buf })
+
+    if not val.winclosed_event then
+      return
+    end
+    vim.api.nvim_create_autocmd("WinClosed", {
+      buffer = buf,
+      callback = function()
+        if state[buf] then
+          vim.schedule(function()
+            utils.close(val)
+          end)
+        end
+      end,
+    })
+  end
+end
+
+--- @param buf integer
+function M.run(buf, opts)
+  vim.api.nvim_set_option_value("filetype", "VoltWindow", { buf = buf })
   if opts.custom_empty_lines then
     opts.custom_empty_lines()
   else
     M.set_empty_lines(buf, opts.h, opts.w)
   end
 
-  require "volt.highlights"
+  require("volt.highlights")
 
   M.redraw(buf, "all")
 
-  api.nvim_set_option_value("modifiable", false, { buf = buf })
+  vim.api.nvim_set_option_value("modifiable", false, { buf = buf })
 
   if not vim.g.extmarks_events then
     require("volt.events").enable()
   end
 end
 
-M.toggle_func = function(open_func, ui_state)
-  if ui_state then
+---@param open_func function
+function M.toggle_func(open_func, ui_state)
+  if ui_state and open_func then
     open_func()
   else
-    api.nvim_feedkeys("q", "x", false)
+    vim.api.nvim_feedkeys("q", "x", false)
   end
 end
 
-M.close = function(buf)
+---@param buf? integer
+function M.close(buf)
   if not buf then
-    api.nvim_feedkeys("q", "x", false)
-    return
+    vim.api.nvim_feedkeys("q", "x", false)
+  else
+    vim.api.nvim_buf_call(buf, function()
+      vim.api.nvim_feedkeys("q", "x", false)
+    end)
   end
-
-  api.nvim_buf_call(buf, function()
-    api.nvim_feedkeys("q", "x", false)
-  end)
 end
 
 return M

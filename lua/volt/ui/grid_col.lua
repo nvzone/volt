@@ -1,28 +1,35 @@
-local linew = require("volt.ui.components").line_w
-
-local add_empty_space = function(lines, w, pad)
+--- @generic T: table
+--- @param lines T
+--- @param w integer
+--- @param pad integer
+--- @return T lines
+local function add_empty_space(lines, w, pad)
   for _, line in ipairs(lines) do
-    table.insert(line, { string.rep(" ", w - linew(line) + pad) })
+    table.insert(line, { (" "):rep(w - require("volt.ui.components").line_w(line) + pad) })
   end
-
   return lines
 end
 
-local append_tb = function(t1, t2)
+---@generic T: table, V: table
+--- @param t1 T
+--- @param t2 V
+local function append_tb(t1, t2)
   for _, v in ipairs(t2) do
     table.insert(t1, v)
   end
 end
 
+--- @param columns { lines: string[][][], w: integer, pad?: integer }[]
+--- @return string[][][] result
 return function(columns)
-  local ui_sections = {}
-  local empty_space = {}
+  local ui_sections = {} ---@type string[][][]|string[][]
+  local empty_space = {} ---@type string[][]
   local h = 0
 
   for _, column in ipairs(columns) do
     local pad = column.pad or 0
     table.insert(ui_sections, add_empty_space(column.lines, column.w, pad))
-    table.insert(empty_space, { { string.rep(" ", column.w + pad) } })
+    table.insert(empty_space, { { (" "):rep(column.w + pad) } })
 
     local col_h = #column.lines
     if h < col_h then
@@ -30,8 +37,7 @@ return function(columns)
     end
   end
 
-  local result = {}
-
+  local result = {} ---@type string[][][]
   for i = 1, h do
     if not result[i] then
       table.insert(result, {})

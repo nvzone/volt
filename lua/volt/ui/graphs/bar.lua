@@ -1,12 +1,9 @@
-local utils = require "volt.ui.graphs.utils"
-
-local gen_graph = function(lines, val, opts)
-  local barchar = string.rep(opts.icon or "█", opts.w)
-  local emptychar = string.rep(" ", opts.w)
-  local gap = string.rep(" ", opts.gap)
+local function gen_graph(lines, val, opts)
+  local barchar = (opts.icon or "█"):rep(opts.w)
+  local emptychar = (" "):rep(opts.w)
+  local gap = (" "):rep(opts.gap)
   local dual_hl = opts.dual_hl
   local format_hl = opts.format_hl
-
   val = vim.tbl_map(function(x)
     return (math.floor(x / 10) * 10) / 10
   end, val)
@@ -29,19 +26,22 @@ local gen_graph = function(lines, val, opts)
   end
 end
 
+---@param data table
+---@return string[][][] lines
 return function(data)
-  local lines = {}
+  local utils = require("volt.ui.graphs.utils")
 
+  local lines = {} ---@type string[][][]
   local total_w = #data.val * (data.baropts.w + data.baropts.gap) + 1
-  local bottom_line = { "└" .. string.rep("─", total_w), "linenr" }
+  local bottom_line = { "└" .. ("─"):rep(total_w), "linenr" }
 
   local sidelabels_data = utils.gen_labels(data.format_labels)
   local sidelabels = sidelabels_data.labels
 
-  local l_pad = { string.rep(" ", sidelabels_data.maxw) }
+  local l_pad = { (" "):rep(sidelabels_data.maxw) }
 
   for i = 10, 1, -1 do
-    local line = {}
+    local line = {} ---@type string[][]
     table.insert(line, { sidelabels[i], "commentfg" })
     table.insert(line, { " │ ", "linenr" })
     table.insert(lines, line)
