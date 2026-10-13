@@ -3,10 +3,10 @@ local buf_i = 1
 --- @param hex integer|nil|?
 --- @return string str
 local function hexadecimal_to_hex(hex)
-  return "#" .. ("%06x"):format(not hex and 0 or hex)
+  return ("#%06x"):format(not hex and 0 or hex)
 end
 
----@class volt.Utils
+--- @class volt.Utils
 local M = {}
 
 --- @param bufs integer[]
@@ -19,20 +19,19 @@ end
 --- @param step number
 function M.cycle_clickables(buf, step)
   local bufstate = require("volt.state")[buf]
-  local lines = {} ---@type integer[]
+  local lines = {} --- @type integer[]
   for row, val in pairs(bufstate.clickables) do
     if #val > 0 then
       table.insert(lines, row)
     end
   end
 
-  local cur_row = vim.api.nvim_win_get_cursor(0)[1]
-  local len = #lines
-  local from_loop = step > 0 and 1 or len
-  local to_loop = step > 0 and len or 1
+  local win = vim.api.nvim_get_current_win()
+  local cur_row = vim.api.nvim_win_get_cursor(win)[1]
+  local from_loop, to_loop = step > 0 and 1 or #lines, step > 0 and #lines or 1
   for i = from_loop, to_loop, step do
     if (step > 0 and lines[i] > cur_row) or (step < 0 and lines[i] < cur_row) then
-      vim.api.nvim_win_set_cursor(0, { lines[i], 0 })
+      vim.api.nvim_win_set_cursor(win, { lines[i], 0 })
       return
     end
   end
@@ -69,7 +68,7 @@ end
 --- @param name string
 --- @return vim.api.keyset.highlight result
 function M.get_hl(name)
-  local result = {} ---@type vim.api.keyset.highlight
+  local result = {} --- @type vim.api.keyset.highlight
   local hl = vim.api.nvim_get_hl(0, { name = name })
 
   if hl.fg then

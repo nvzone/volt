@@ -1,4 +1,4 @@
----@class volt.UI.Graphs.Utils
+--- @class volt.UI.Graphs.Utils
 local M = {}
 
 --- @param format fun(n: integer): fmt: string
@@ -20,9 +20,10 @@ function M.gen_labels(format)
   return { labels = result, maxw = max_strw + 1 }
 end
 
----@param virt_txt string
----@param total_w integer
----@param l_pad integer
+--- @param virt_txt string
+--- @param total_w integer
+--- @param l_pad integer
+--- @return string[][]|string[] label
 function M.footer_label(virt_txt, total_w, l_pad)
   local pad = math.floor((total_w / 2 + l_pad) - (vim.api.nvim_strwidth(virt_txt[1]) / 2))
   return { { (" "):rep(pad) }, virt_txt }

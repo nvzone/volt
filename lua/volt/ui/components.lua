@@ -1,13 +1,13 @@
 local M = {}
 
 --- @class CheckboxOptions
---- @field actions table|nil|? Actions associated with the checkbox (optional).
+--- @field actions? table Actions associated with the checkbox (optional).
 --- @field active boolean Indicates if the checkbox is active.
---- @field check string|nil|? Replace the default check icon with a custom one.
---- @field hloff? string|nil|? Highlight for the inactive state (optional).
---- @field hlon? string|nil|? Highlight for the active state (optional).
+--- @field check? string Replace the default check icon with a custom one.
+--- @field hloff? string Highlight for the inactive state (optional).
+--- @field hlon? string Highlight for the active state (optional).
 --- @field txt string The text to display next to the checkbox.
---- @field uncheck string|nil|? Replace the deafult unchecked icon with a custom one.
+--- @field uncheck? string Replace the deafult unchecked icon with a custom one.
 
 --- @param o CheckboxOptions The options for the checkbox.
 --- @return string[] A table containing the checkbox representation.
@@ -36,11 +36,9 @@ function M.progressbar(o)
   o = vim.tbl_deep_extend("force", opts, o)
 
   local activelen = math.floor(o.w * (o.val / 100))
-  local inactivelen = o.w - activelen
-
   return {
     { o.icon.on:rep(activelen), o.hl.on },
-    { o.icon.off:rep(inactivelen), o.hl.off },
+    { o.icon.off:rep(o.w - activelen), o.hl.off },
   }
 end
 
@@ -55,7 +53,7 @@ end
 --- @param tb (string[][][]|string[][])[]
 --- @return string[][][]|string[][] row
 function M.grid_row(tb)
-  local result = {} ---@type string[][][]|string[][]
+  local result = {} --- @type string[][][]|string[][]
   for _, lines in ipairs(tb) do
     for _, line in ipairs(lines) do
       table.insert(result, line)
@@ -82,11 +80,9 @@ function M.border(lines, hl)
   hl = hl or "linenr"
 
   local maxw = 0
-  local line_widths = {} ---@type integer[]
-
+  local line_widths = {} --- @type integer[]
   for _, line in ipairs(lines) do
     local linew = M.line_w(line)
-
     if maxw < linew then
       maxw = linew
     end
@@ -106,7 +102,7 @@ function M.border(lines, hl)
   table.insert(lines, { { "└" .. horiz_chars .. "┘", hl } })
 end
 
----@generic T: table
+--- @generic T: table
 --- @param line T
 --- @param w integer
 --- @return T line

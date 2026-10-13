@@ -11,8 +11,7 @@ return function(data, w, opts)
     end
   end
 
-  local lines = { {}, {}, {} } ---@type string[][][]|string[][]
-  local datalen = #data
+  local lines = { {}, {}, {} } --- @type string[][][]|string[][]
   for i, v in ipairs(data) do
     if v == "_pad_" then
       local emptychar = (" "):rep(w - total_str_w)
@@ -26,7 +25,7 @@ return function(data, w, opts)
       table.insert(lines[2], { "│ " .. v .. " │", hl })
       table.insert(lines[3], { "└" .. hchar .. "┘", hl })
 
-      if i ~= datalen then
+      if i ~= #data then
         table.insert(lines[1], { " " })
         table.insert(lines[2], { " " })
         table.insert(lines[3], { " " })

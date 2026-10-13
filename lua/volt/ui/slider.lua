@@ -1,11 +1,11 @@
----@class volt.UI.Slider
+--- @class volt.UI.Slider
 local M = {}
 
----@param w integer
----@param left_txt string
----@param xpad integer
----@param opts? { ratio?: number, thumb?: string }
----@return integer val
+--- @param w integer
+--- @param left_txt string
+--- @param xpad integer
+--- @param opts? { ratio?: number, thumb?: string }
+--- @return integer val
 function M.val(w, left_txt, xpad, opts)
   opts = opts or {}
   local txt_len = vim.fn.strwidth(left_txt or "")

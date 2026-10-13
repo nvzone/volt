@@ -10,7 +10,7 @@ local function add_empty_space(lines, w, pad)
   return lines
 end
 
----@generic T: table, V: table
+--- @generic T: table, V: table
 --- @param t1 T
 --- @param t2 V
 local function append_tb(t1, t2)
@@ -22,8 +22,8 @@ end
 --- @param columns { lines: string[][][], w: integer, pad?: integer }[]
 --- @return string[][][] result
 return function(columns)
-  local ui_sections = {} ---@type string[][][]|string[][]
-  local empty_space = {} ---@type string[][]
+  local ui_sections = {} --- @type string[][][]|string[][]
+  local empty_space = {} --- @type string[][]
   local h = 0
 
   for _, column in ipairs(columns) do
@@ -37,7 +37,7 @@ return function(columns)
     end
   end
 
-  local result = {} ---@type string[][][]
+  local result = {} --- @type string[][][]
   for i = 1, h do
     if not result[i] then
       table.insert(result, {})

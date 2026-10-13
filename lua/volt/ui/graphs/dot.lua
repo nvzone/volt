@@ -4,8 +4,8 @@ local default_opts = {
   sidelabels = true,
 }
 
----@param lines string[][]
----@param val integer[]
+--- @param lines string[][]
+--- @param val integer[]
 local function gen_graph(lines, val, baropts)
   val = vim.tbl_map(function(x)
     return (math.floor(x / 10) * 10) / 10

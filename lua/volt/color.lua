@@ -23,7 +23,7 @@
 -- All credits to https://github.com/LeonHeidelbach for making this!
 -- 90% of functions are written by him
 
----@class volt.Color
+--- @class volt.Color
 local M = {}
 
 -- Convert a hex color value to RGB
@@ -33,14 +33,12 @@ local M = {}
 --- @return integer|nil|? b: Blue (0-255)
 function M.hex2rgb(hex)
   local hash = hex:sub(1, 1) == "#"
-  if hex:len() ~= (7 - (hash and 0 or 1)) then
-    return
+  if hex:len() == 7 - (hash and 0 or 1) then
+    local r = tonumber(hex:sub(2 - (hash and 0 or 1), 3 - (hash and 0 or 1)), 16)
+    local g = tonumber(hex:sub(4 - (hash and 0 or 1), 5 - (hash and 0 or 1)), 16)
+    local b = tonumber(hex:sub(6 - (hash and 0 or 1), 7 - (hash and 0 or 1)), 16)
+    return r, g, b
   end
-
-  local r = tonumber(hex:sub(2 - (hash and 0 or 1), 3 - (hash and 0 or 1)), 16)
-  local g = tonumber(hex:sub(4 - (hash and 0 or 1), 5 - (hash and 0 or 1)), 16)
-  local b = tonumber(hex:sub(6 - (hash and 0 or 1), 7 - (hash and 0 or 1)), 16)
-  return r, g, b
 end
 
 -- Convert a hex color value to RGB ratio
@@ -205,16 +203,16 @@ end
 function M.compute_gradient(hex1, hex2, steps)
   local h1, s1, l1 = M.hex2hsl(hex1)
   local h2, s2, l2 = M.hex2hsl(hex2)
-  local h, s, l ---@type number, number, number
+  local h, s, l --- @type number, number, number
   local h_step = (h2 - h1) / (steps - 1)
   local s_step = (s2 - s1) / (steps - 1)
   local l_step = (l2 - l1) / (steps - 1)
-  local gradient = {} ---@type string[]
+  local gradient = {} --- @type string[]
   for i = 0, steps - 1 do
     h = h1 + (h_step * i)
     s = s1 + (s_step * i)
     l = l1 + (l_step * i)
-    gradient[i + 1] = M.hsl2hex(h, s, l)
+    table.insert(gradient, M.hsl2hex(h, s, l))
   end
 
   return gradient
@@ -226,7 +224,7 @@ end
 --- @return string[] complementary_colors: A table containing the complementary colors in hex format
 function M.hex2complementary(hex, count)
   local h, s, l = M.hex2hsl(hex)
-  local complementary_colors = {} ---@type string[]
+  local complementary_colors = {} --- @type string[]
   local complementary_hue = (h + 180) % 360
   local hue_step = 360 / count
   for i = 0, count - 1 do

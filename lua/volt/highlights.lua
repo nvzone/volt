@@ -1,10 +1,11 @@
 local lighten = require("volt.color").change_hex_lightness
 
-local highlights = {} ---@type table<string, vim.api.keyset.highlight>
+local highlights = {} --- @type table<string, vim.api.keyset.highlight>
 
 --- @param hex? integer
+--- @return string hex_str
 local function hexadecimal_to_hex(hex)
-  return "#" .. ("%06x"):format((hex == nil and 0 or hex))
+  return ("#%06x"):format(hex or 0)
 end
 
 --- @param name string

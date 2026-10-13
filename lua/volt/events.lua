@@ -2,7 +2,10 @@ local nvmark_state = require("volt.state")
 local MouseMove = vim.keycode("<MouseMove>")
 local LeftMouse = vim.keycode("<LeftMouse>")
 
----@param n integer
+--- @generic T
+--- @param tb T
+--- @param n integer
+--- @return any item
 local function get_item_from_col(tb, n)
   for _, val in ipairs(tb) do
     if val.col_start <= n and val.col_end >= n then
@@ -20,14 +23,14 @@ local function run_func(foo)
   end
 end
 
----@param buf integer
----@param by? string
----@param row? integer
----@param col? integer
----@param win? integer
+--- @param buf integer
+--- @param by? string
+--- @param row? integer
+--- @param col? integer
+--- @param win? integer
 local function handle_click(buf, by, row, col, win)
   if not row then
-    local cursor_pos = vim.api.nvim_win_get_cursor(0)
+    local cursor_pos = vim.api.nvim_win_get_cursor(vim.api.nvim_get_current_win())
     row, col = cursor_pos[1], cursor_pos[2]
   end
 
@@ -47,7 +50,7 @@ local function handle_click(buf, by, row, col, win)
   end
 end
 
----@param buf integer
+--- @param buf integer
 local function set_cursormoved_autocmd(buf)
   vim.api.nvim_create_autocmd("CursorMoved", {
     buffer = buf,
@@ -100,24 +103,23 @@ local function buf_mappings(buf)
   end, { buffer = buf })
 end
 
----@class volt.Events
----@field bufs integer[]
+--- @class volt.Events
+--- @field bufs integer[]
 local M = {}
 
 M.bufs = {}
 
----@param val integer[]|integer
+--- @param val integer[]|integer
 function M.add(val)
   if type(val) == "table" then
     for _, buf in ipairs(val) do
       table.insert(M.bufs, buf)
       buf_mappings(buf)
     end
-    return
+  else
+    table.insert(M.bufs, val)
+    buf_mappings(val)
   end
-
-  table.insert(M.bufs, val)
-  buf_mappings(val)
 end
 
 function M.enable()
@@ -126,16 +128,13 @@ function M.enable()
 
   vim.on_key(function(key)
     local mousepos = vim.fn.getmousepos()
-    local cur_win = mousepos.winid
-    local cur_buf = vim.api.nvim_win_get_buf(cur_win)
-
+    local cur_buf = vim.api.nvim_win_get_buf(mousepos.winid)
     if vim.tbl_contains(M.bufs, cur_buf) then
       local row, col = mousepos.line, mousepos.column - 1
-
       if key == MouseMove then
         handle_hover(nvmark_state[cur_buf], cur_buf, row, col)
       elseif key == LeftMouse then
-        handle_click(cur_buf, "mouse", row, col, cur_win)
+        handle_click(cur_buf, "mouse", row, col, mousepos.winid)
       end
     end
   end)

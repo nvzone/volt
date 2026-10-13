@@ -10,15 +10,15 @@
 --- @field ns integer
 --- @field xpad integer
 
----@class Volt
-local M = {}
-local draw = require("volt.draw")
 local state = require("volt.state")
 local utils = require("volt.utils")
 
+--- @class Volt
+local M = {}
+
 --- @param tb VoltData.Layout[]
 --- @param name string
---- @return VoltData.Layout|nil|?
+--- @return VoltData.Layout|nil|? section
 local function get_section(tb, name)
   for _, value in ipairs(tb) do
     if value.name == name then
@@ -56,6 +56,7 @@ end
 --- @param buf integer
 --- @param names string[]|string|"all"
 function M.redraw(buf, names)
+  local draw = require("volt.draw")
   local v = state[buf]
   if names == "all" then
     for _, section in ipairs(v.layout) do
@@ -74,7 +75,7 @@ end
 --- @param n integer
 --- @param w integer
 function M.set_empty_lines(buf, n, w)
-  local empty_lines = {} ---@type string[]
+  local empty_lines = {} --- @type string[]
   for _ = 1, n, 1 do
     table.insert(empty_lines, (" "):rep(w))
   end
@@ -134,7 +135,7 @@ function M.run(buf, opts)
   end
 end
 
----@param open_func function
+--- @param open_func function
 function M.toggle_func(open_func, ui_state)
   if ui_state and open_func then
     open_func()
@@ -143,7 +144,7 @@ function M.toggle_func(open_func, ui_state)
   end
 end
 
----@param buf? integer
+--- @param buf? integer
 function M.close(buf)
   if not buf then
     vim.api.nvim_feedkeys("q", "x", false)

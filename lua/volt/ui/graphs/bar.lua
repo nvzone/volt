@@ -13,7 +13,6 @@ local function gen_graph(lines, val, opts)
       local cell = v >= i and barchar or emptychar
       local kekw = (11 - i) <= 0 and 11 or (11 - i)
       local hl = opts.hl or "exgreen"
-
       if dual_hl then
         hl = v <= i and dual_hl[1] or dual_hl[2]
       elseif format_hl then
@@ -26,12 +25,12 @@ local function gen_graph(lines, val, opts)
   end
 end
 
----@param data table
----@return string[][][] lines
+--- @param data table
+--- @return string[][][] lines
 return function(data)
   local utils = require("volt.ui.graphs.utils")
 
-  local lines = {} ---@type string[][][]
+  local lines = {} --- @type string[][][]
   local total_w = #data.val * (data.baropts.w + data.baropts.gap) + 1
   local bottom_line = { "└" .. ("─"):rep(total_w), "linenr" }
 
@@ -41,7 +40,7 @@ return function(data)
   local l_pad = { (" "):rep(sidelabels_data.maxw) }
 
   for i = 10, 1, -1 do
-    local line = {} ---@type string[][]
+    local line = {} --- @type string[][]
     table.insert(line, { sidelabels[i], "commentfg" })
     table.insert(line, { " │ ", "linenr" })
     table.insert(lines, line)

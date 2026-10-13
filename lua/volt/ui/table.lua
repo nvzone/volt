@@ -8,14 +8,8 @@ local function get_column_widths(tb, w)
   for i = 1, maxrow do
     local maxlen = 0
     for _, row in ipairs(tb) do
-      local txt = type(row[i]) == "table" and row[i][1] or row[i]
-      local str = tostring(txt)
-      local tmpw = 0
-      if type(row[i]) == "table" then
-        tmpw = require("volt.ui.components").line_w(row[i])
-      else
-        tmpw = vim.api.nvim_strwidth(str)
-      end
+      local tmpw = type(row[i]) == "table" and require("volt.ui.components").line_w(row[i])
+        or vim.api.nvim_strwidth(tostring(type(row[i]) == "table" and row[i][1] or row[i]))
 
       maxlen = math.max(maxlen, tmpw)
     end
@@ -24,31 +18,27 @@ local function get_column_widths(tb, w)
     sum = sum + maxlen
   end
 
-  local remaining_space = fit_w and sum or w - sum
-  local ratio = math.floor(remaining_space / maxrow)
-
+  local ratio = math.floor((fit_w and sum or w - sum) / maxrow)
   local col_widths = vim.tbl_map(function(x)
     sum = sum + ratio
     return x + ratio - 2
   end, result)
-
   if not fit_w then
-    local last_item = col_widths[#col_widths]
     -- -1 cuz last col has right border too
-    col_widths[#col_widths] = last_item + (fit_w and sum or w - sum) - 1
+    col_widths[#col_widths] = col_widths[#col_widths] + (fit_w and sum or w - sum) - 1
   end
 
   return col_widths
 end
 
 local border_chars = {
-  mid = { top = "┬", bot = "┴", none = "┼" },
   corners_left = { top = "┌", bot = "└", none = "├" },
   corners_right = { top = "┐", bot = "┘", none = "┤" },
+  mid = { top = "┬", bot = "┴", none = "┼" },
 }
 
 --- @param points integer[]
---- @param row_type string|nil
+--- @param row_type? string|"none"
 local function table_border(points, row_type)
   row_type = row_type or "none"
 
@@ -58,11 +48,7 @@ local function table_border(points, row_type)
     t_char = i == tblen and "" or t_char
     str = str .. ("─"):rep(n + 1) .. t_char
   end
-
-  local l_char = border_chars.corners_left[row_type]
-  local r_char = border_chars.corners_right[row_type]
-
-  return { { l_char .. str .. r_char, "linenr" } }
+  return { { border_chars.corners_left[row_type] .. str .. border_chars.corners_right[row_type], "linenr" } }
 end
 
 --- @generic T: table
@@ -74,7 +60,7 @@ end
 return function(tbl, w, header_hl, title)
   local col_widths = get_column_widths(tbl, w)
 
-  local lines = {} ---@type string[][][]|string[][]
+  local lines = {} --- @type string[][][]|string[][]
   local tb_border_up = table_border(col_widths, "top")
   local tb_border_middle = table_border(col_widths)
   local tb_border_down = table_border(col_widths, "bot")
@@ -83,21 +69,20 @@ return function(tbl, w, header_hl, title)
   local end_i = #tbl
 
   for line_i, row in ipairs(tbl) do
-    local line = {} ---@type string[][]
+    local line = {} --- @type string[][]
 
     for i, v in ipairs(row) do
-      local maxlen = col_widths[i]
-      local is_virt = type(v) == "table"
-      local strlen = is_virt and require("volt.ui.components").line_w(v) or vim.api.nvim_strwidth(tostring(v))
-      local pad_w = math.floor((maxlen - strlen) / 2)
+      local strlen = type(v) == "table" and require("volt.ui.components").line_w(v)
+        or vim.api.nvim_strwidth(tostring(v))
+      local pad_w = math.floor((col_widths[i] - strlen) / 2)
       local l_pad = (" "):rep(pad_w)
-      local r_pad = (" "):rep(maxlen - pad_w - strlen)
+      local r_pad = (" "):rep(col_widths[i] - pad_w - strlen)
       local hl = (line_i == 1 and (header_hl or "exgreen") or "normal")
 
       table.insert(line, { "│ ", "linenr" })
 
       -- Complex row i.e table of virt text..
-      if is_virt then
+      if type(v) == "table" then
         table.insert(line, { l_pad })
         for _, virt in ipairs(v) do
           table.insert(line, virt)
