@@ -1,9 +1,7 @@
-local api = vim.api
-local set_extmark = api.nvim_buf_set_extmark
-local state = require "volt.state"
-
+--- @param buf integer
+--- @param section VoltData.Layout
 return function(buf, section)
-  local v = state[buf]
+  local v = require("volt.state")[buf]
   local section_lines = section.lines(buf)
   local xpad = section.col_start or v.xpad or 0
 
@@ -20,7 +18,6 @@ return function(buf, section)
 
       if mark[3] then
         local virt = { col_start = col - strlen, col_end = col, actions = mark[3] }
-
         if strlen == 1 and #mark[1] == 1 then
           virt.col_end = virt.col_start
         end
@@ -46,6 +43,6 @@ return function(buf, section)
   for line, marks in ipairs(section_lines) do
     local row = line + section.row
     local opts = { virt_text_win_col = xpad, virt_text = marks, id = row }
-    set_extmark(buf, v.ns, row - 1, 0, opts)
+    vim.api.nvim_buf_set_extmark(buf, v.ns, row - 1, 0, opts)
   end
 end
