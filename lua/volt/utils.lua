@@ -44,6 +44,7 @@ M.close = function(val)
     local valid_buf = api.nvim_buf_is_valid(buf)
 
     if valid_buf then
+      pcall(api.nvim_win_close, vim.fn.bufwinid(buf), true)
       api.nvim_buf_delete(buf, { force = true })
       state[buf] = nil
     end
