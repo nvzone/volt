@@ -57,6 +57,13 @@ local function set_cursormoved_autocmd(buf)
 end
 
 local function handle_hover(buf_state, buf, row, col)
+  local virt = buf_state.hoverables[row] and get_item_from_col(buf_state.hoverables[row], col)
+  local hover_id = virt and virt.hover and virt.hover.id
+
+  if hover_id and hover_id == vim.g.nvmark_hovered then
+    return
+  end
+
   -- clear old hovers!
   if buf_state.hovered_extmarks then
     vim.g.nvmark_hovered = nil
@@ -64,20 +71,16 @@ local function handle_hover(buf_state, buf, row, col)
     buf_state.hovered_extmarks = nil
   end
 
-  if buf_state.hoverables[row] then
-    local virt = get_item_from_col(buf_state.hoverables[row], col)
+  if virt and virt.hover then
+    local hover = virt.hover
 
-    if virt and virt.hover then
-      local hover = virt.hover
-
-      if hover.callback then
-        hover.callback()
-      end
-
-      vim.g.nvmark_hovered = hover.id or nil
-      redraw(buf, hover.redraw)
-      buf_state.hovered_extmarks = hover.redraw
+    if hover.callback then
+      hover.callback()
     end
+
+    vim.g.nvmark_hovered = hover.id or nil
+    redraw(buf, hover.redraw)
+    buf_state.hovered_extmarks = hover.redraw
   end
 end
 
